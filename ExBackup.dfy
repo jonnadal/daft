@@ -1,11 +1,13 @@
-include "Seqs.dfy"
-
 // This is a Dafny implementation of the example from James Wilcox's blog post "How to build
 // a simple system in Verdi" (http://homes.cs.washington.edu/~jrw12/Counter.html). Rather than
 // factoring out a reusable implementation of reliable network semantics with directed message
 // delivery, this implementation simulates reliable broadcast. It also does not expose external
 // inputs/outputs. These features were left out to keep this example minimal. Also note that we
 // do assume in-order delivery here, again for simplicity.
+
+// Note that the code relies on a sequence appending lemma from [Seqs.dfy](./Seqs.html).
+include "Seqs.dfy"
+
 module ReliableNetworkSemantics {
   import opened Seqs
   datatype NodeId = PrimaryId | BackupId

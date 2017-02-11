@@ -1,3 +1,6 @@
+// Helpers for Dafny's built-in `seq<T>` type. Used by:
+// - [ExBackup.dfy](./ExBackup.html)
+
 module Seqs {
   function method filter<T>(xs: seq<T>, pred: T -> bool): seq<T>
     reads pred.reads
