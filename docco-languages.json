@@ -1,0 +1,4 @@
+{
+  "//": "the 'typescript' highlighter is close enough...",
+  ".dfy": {"name": "typescript", "symbol": "//"}
+}

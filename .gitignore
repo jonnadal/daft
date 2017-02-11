@@ -3,4 +3,7 @@
 *.exe
 *.mdb
 *.swp
+\#*
+.*
 flycheck_*
+docs/
