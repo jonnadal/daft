@@ -1,0 +1,20 @@
+{
+  "name": "jonnadal-blog",
+  "scripts": {
+    "auto": "ls *.js | entr -r sh -c",
+    "debug": "node --harmony ${PROJ?}.js --self-test --debug | tap-spec",
+    "perf": "node --harmony ${PROJ?}.js --perf",
+    "test": "node --harmony ${PROJ?}.js --self-test | tap-min"
+  },
+  "author": "jon.nadal@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "tape": "^4.6.3"
+  },
+  "devDependencies": {
+    "docco": "^0.7.0",
+    "tap-min": "^1.1.0",
+    "tap-spec": "^4.1.1"
+  },
+  "private": true
+}
