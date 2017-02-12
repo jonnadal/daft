@@ -25,6 +25,7 @@ const util = require('util');
 //
 // ## Examples ##
 //
+
 // Let's start by writing a test to outline what "correct" looks like.
 // We introduce a function that lets us embed tests in this source file, choosing to run the tests by passing a `--self-test` command line argument.
 // For the underlying tests, we leverage the [tape](https://github.com/substack/tape) library, which outputs test results in the [Test Anything Protocol](https://en.wikipedia.org/wiki/Test_Anything_Protocol) (TAP) format.
@@ -91,14 +92,33 @@ testfn(solve, (t, fn) => {
 // ## Solver Implementation ##
 //
 
-// Many SAT algorithms exist, and one of the most fundamental is [DPLL](https://en.wikipedia.org/wiki/DPLL_algorithm):
+// Many SAT algorithms exist, and one of the most fundamental is [DPLL](https://en.wikipedia.org/wiki/DPLL_algorithm).
+// We collect assignments as follows:
+//
+// 1. Choose an unassigned variable, stopping if none are available.
+// 2. For each possible truth value assignment of that variable, verify that the assignment does not contradict any clauses, backtracking if both assignments contradict.
+// 3. Assuming an assignment does not yet contradict, recurse with a simplified problem in which the variable no longer exists, cleaning up clauses as necessary. If our recursive call succeeds, we're done. If it fails for both `true` and `false`, we backtrack (as a different assignment of previously assigned variables might be successful).
+
+function solve(clauses, assignment = {}) {
+    return trace(solve, arguments, () => { // we wrap in a helper for debugging
+        const v = nextVar(clauses);
+        if (!v) { return assignment; }
+        for (const value of [true, false]) {
+            if (canAssign(value, v, clauses)) {
+                const result = solve(removeVar(value, v, clauses), newAssignment(assignment, v, value));
+                if (result) { return result; }
+            }
+        }
+        return null;
+    });
+}
+
+// The above implementation relies on the following four helpers:
 //
 // 1. `nextVar`: choose a variable favoring "unit" clauses with only one possible assignment;
 // 2. `canAssign`: infer when an assignment of that variable violates any clause;
 // 3. `removeVar`: "clean up" satisfied clauses; and
-// 4. `newAssignment`: update a collection of assignments (which can be unwound by backtracking when all possible assignments of a variable lead to a clause violation).
-//
-// We start by introducing a helper for each of the above steps.
+// 4. `newAssignment`: add a variable-to-truth-value assignment to a collection of assignments.
 
 testfn(nextVar, (t, fn) => {
     t.deepEqual(fn([]), null);
@@ -169,31 +189,10 @@ function newAssignment(original, variable, value) {
     return result;
 }
 
-// Now we can bring those pieces together to implement the DPLL algorithm.
-
-function solve(clauses, assignment = {}) {
-    return trace(solve, arguments, () => { // we wrap in a helper for debugging
-        const v = nextVar(clauses);
-        if (!v) { return assignment; }
-        if (canAssign(true, v, clauses)) {
-            const result = solve(removeVar(true, v, clauses), newAssignment(assignment, v, true));
-            if (result) {
-                return result;
-            }
-        }
-        if (canAssign(false, v, clauses)) {
-            const result = solve(removeVar(false, v, clauses), newAssignment(assignment, v, false));
-            if (result) {
-                return result;
-            }
-        }
-        return null;
-    });
-}
-
 //
 // ## Parsing ##
 //
+
 // The [DIMACS CNF format](http://people.sc.fsu.edu/~jburkardt%20/data/cnf/cnf.html) specifies a common encoding for CNF expressions.
 // By parsing this format, we can validate our implemenation against more test data and also easily compare our SAT performance with other implementations.
 
@@ -246,6 +245,7 @@ function parseDimacs(data) {
 //
 // # Performance #
 //
+
 // Similar to our `testfn` helper, we introduce a `timefn` helper that only runs performance tests if the program is started with a `--perf` argument.
 
 function timefn(fn, impl) {
@@ -291,6 +291,7 @@ timefn(solve, (fn, time) => {
 //
 // ## Appendix: Development Helpers ##
 //
+
 // TAP parsers expect a leading `#` for comments, and outputing debug information to the console without that leading `#` breaks parsing.
 // To make our debug logging slightly less verbose, we introduce another small helper, `debug`.
 //
