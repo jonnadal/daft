@@ -86,7 +86,7 @@ module LossyNetworkSemantics {
         ==> nodes[BackupId].backupCount == nodes[PrimaryId].primaryCount
       // Here's a more interesting property that Dafny can't prove by itself, and I don't have
       // the required lemmas worked out yet. May require a history trace.
-      //invariant nodes[PrimaryId].isSyncing == false ==> nodes[BackupId].backupCount == nodes[PrimaryId].primaryCount
+      /* invariant nodes[PrimaryId].isSyncing == false ==> nodes[BackupId].backupCount == nodes[PrimaryId].primaryCount */
     {
       // Lossy network semantics (re-ordering comes from the data structure).
       if (*) {
